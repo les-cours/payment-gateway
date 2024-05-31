@@ -1,0 +1,33 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type Mutation {
+
+
+    chargeAccount(in: ChargeAccountRequest!): OperationStatus!
+    generatePaymentCode(amount: Float!): String
+    payClassRoom(in: PayClassRoomRequest!): String
+
+}
+
+type Query {
+    getAmount(studentID: String!):Int!
+}
+
+
+input PayClassRoomRequest {
+    classroomID : String!
+    month: Int!
+}
+
+input ChargeAccountRequest {
+    studentID : String!
+    code : String!
+}
+
+type OperationStatus {
+    succeeded: Boolean!
+}
+
