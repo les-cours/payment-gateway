@@ -14,7 +14,7 @@ func (r *mutationResolver) PayClassRoom(ctx context.Context, in models.PayClassR
 	//	return nil, ErrPermissionDenied
 	//}
 	//
-	//if !user.Read.USER {
+	//if !user.Read.PAYMENT {
 	//	return nil, ErrPermissionDenied
 	//}
 
