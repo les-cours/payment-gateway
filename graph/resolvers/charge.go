@@ -4,36 +4,25 @@ import (
 	"context"
 	"github.com/les-cours/payment-gateway/api/payment"
 	"github.com/les-cours/payment-gateway/graph/models"
+	"github.com/les-cours/payment-gateway/types"
 	"log"
 )
 
-func (r *queryResolver) GetAmount(ctx context.Context, studentID string) (int, error) {
+func (r *queryResolver) GetAmount(ctx context.Context) (float64, error) {
 
-	var x = 1500
-	return x, nil
-	//
-	////var user *types.UserToken
-	////if user, _ = ctx.Value("user").(*types.UserToken); user == nil {
-	////	return nil, ErrPermissionDenied
-	////}
-	////
-	////if !user.Read.USER {
-	////	return nil, ErrPermissionDenied
-	////}
-	//
-	//var students []*models.Student
-	//res, err := r.UserClient.GetStudents(ctx, &users.GetStudentsRequest{
-	//	FilterType:  in.FilterType,
-	//	FilterValue: in.FilterValue,
-	//})
-	//if err != nil {
-	//	return nil, ErrApi(err)
-	//}
-	//for _, student := range res.Students {
-	//	students = append(students, gprcToGraph.Student(student))
-	//}
-	//
-	//return students, nil
+	user, ok := ctx.Value("user").(*types.UserToken)
+	if !ok || *user == (types.UserToken{}) {
+		return 0, ErrPermissionDenied
+	}
+
+	res, err := r.PaymentClient.GetAmount(ctx, &payment.GetAmountRequest{
+		StudentID: user.ID,
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	return float64(res.Amount), nil
 }
 
 func (r *mutationResolver) ChargeAccount(ctx context.Context, in models.ChargeAccountRequest) (*models.OperationStatus, error) {

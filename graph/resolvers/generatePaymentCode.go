@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/les-cours/payment-gateway/api/payment"
 	"github.com/les-cours/payment-gateway/types"
-	"log"
 )
 
 func (r *mutationResolver) GeneratePaymentCode(ctx context.Context, amount float64) (*string, error) {
@@ -14,7 +13,7 @@ func (r *mutationResolver) GeneratePaymentCode(ctx context.Context, amount float
 		return nil, ErrPermissionDenied
 	}
 
-	if !user.Read.PAYMENT {
+	if !user.Create.PAYMENT {
 		return nil, ErrPermissionDenied
 	}
 
@@ -23,7 +22,6 @@ func (r *mutationResolver) GeneratePaymentCode(ctx context.Context, amount float
 	})
 
 	if err != nil {
-		log.Println("Err: ", err)
 		return nil, ErrApi(err)
 	}
 

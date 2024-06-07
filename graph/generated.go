@@ -58,7 +58,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetAmount func(childComplexity int, studentID string) int
+		GetAmount func(childComplexity int) int
 	}
 }
 
@@ -68,7 +68,7 @@ type MutationResolver interface {
 	PayClassRoom(ctx context.Context, in models.PayClassRoomRequest) (*string, error)
 }
 type QueryResolver interface {
-	GetAmount(ctx context.Context, studentID string) (int, error)
+	GetAmount(ctx context.Context) (float64, error)
 }
 
 type executableSchema struct {
@@ -138,12 +138,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_getAmount_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.GetAmount(childComplexity, args["studentID"].(string)), true
+		return e.complexity.Query.GetAmount(childComplexity), true
 
 	}
 	return 0, false
@@ -328,21 +323,6 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_getAmount_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["studentID"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("studentID"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["studentID"] = arg0
 	return args, nil
 }
 
@@ -605,7 +585,7 @@ func (ec *executionContext) _Query_getAmount(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetAmount(rctx, fc.Args["studentID"].(string))
+		return ec.resolvers.Query().GetAmount(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -617,9 +597,9 @@ func (ec *executionContext) _Query_getAmount(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(float64)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_getAmount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -629,19 +609,8 @@ func (ec *executionContext) fieldContext_Query_getAmount(ctx context.Context, fi
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			return nil, errors.New("field of type Float does not have child fields")
 		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_getAmount_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
 	}
 	return fc, nil
 }

@@ -25,6 +25,7 @@ type PaymentServiceClient interface {
 	ChargeAccount(ctx context.Context, in *ChargeAccountRequest, opts ...grpc.CallOption) (*AppResponse, error)
 	GeneratePaymentCode(ctx context.Context, in *GeneratePaymentCodeRequest, opts ...grpc.CallOption) (*AppResponse, error)
 	PayClassRoom(ctx context.Context, in *PayClassRoomRequest, opts ...grpc.CallOption) (*AppResponse, error)
+	GetAmount(ctx context.Context, in *GetAmountRequest, opts ...grpc.CallOption) (*GetAmountResponse, error)
 }
 
 type paymentServiceClient struct {
@@ -62,6 +63,15 @@ func (c *paymentServiceClient) PayClassRoom(ctx context.Context, in *PayClassRoo
 	return out, nil
 }
 
+func (c *paymentServiceClient) GetAmount(ctx context.Context, in *GetAmountRequest, opts ...grpc.CallOption) (*GetAmountResponse, error) {
+	out := new(GetAmountResponse)
+	err := c.cc.Invoke(ctx, "/PaymentService/getAmount", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PaymentServiceServer is the server API for PaymentService service.
 // All implementations must embed UnimplementedPaymentServiceServer
 // for forward compatibility
@@ -69,6 +79,7 @@ type PaymentServiceServer interface {
 	ChargeAccount(context.Context, *ChargeAccountRequest) (*AppResponse, error)
 	GeneratePaymentCode(context.Context, *GeneratePaymentCodeRequest) (*AppResponse, error)
 	PayClassRoom(context.Context, *PayClassRoomRequest) (*AppResponse, error)
+	GetAmount(context.Context, *GetAmountRequest) (*GetAmountResponse, error)
 	mustEmbedUnimplementedPaymentServiceServer()
 }
 
@@ -84,6 +95,9 @@ func (UnimplementedPaymentServiceServer) GeneratePaymentCode(context.Context, *G
 }
 func (UnimplementedPaymentServiceServer) PayClassRoom(context.Context, *PayClassRoomRequest) (*AppResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PayClassRoom not implemented")
+}
+func (UnimplementedPaymentServiceServer) GetAmount(context.Context, *GetAmountRequest) (*GetAmountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAmount not implemented")
 }
 func (UnimplementedPaymentServiceServer) mustEmbedUnimplementedPaymentServiceServer() {}
 
@@ -152,6 +166,24 @@ func _PaymentService_PayClassRoom_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PaymentService_GetAmount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAmountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PaymentServiceServer).GetAmount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/PaymentService/getAmount",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PaymentServiceServer).GetAmount(ctx, req.(*GetAmountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PaymentService_ServiceDesc is the grpc.ServiceDesc for PaymentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -170,6 +202,10 @@ var PaymentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "payClassRoom",
 			Handler:    _PaymentService_PayClassRoom_Handler,
+		},
+		{
+			MethodName: "getAmount",
+			Handler:    _PaymentService_GetAmount_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
