@@ -11,8 +11,9 @@ import (
 func (r *mutationResolver) PayClassRoom(ctx context.Context, in models.PayClassRoomRequest) (*string, error) {
 
 	var user *types.UserToken
-	if user, _ = ctx.Value("user").(*types.UserToken); user == nil {
-		return nil, ErrPermissionDenied
+	user, ok := ctx.Value("user").(*types.UserToken)
+	if !ok || *user == (types.UserToken{}) {
+		return 0, ErrPermissionDenied
 	}
 
 	res, err := r.PaymentClient.PayClassRoom(ctx, &payment.PayClassRoomRequest{
