@@ -13,7 +13,7 @@ func (r *mutationResolver) PayClassRoom(ctx context.Context, in models.PayClassR
 	var user *types.UserToken
 	user, ok := ctx.Value("user").(*types.UserToken)
 	if !ok || *user == (types.UserToken{}) {
-		return 0, ErrPermissionDenied
+		return nil, ErrPermissionDenied
 	}
 
 	res, err := r.PaymentClient.PayClassRoom(ctx, &payment.PayClassRoomRequest{
