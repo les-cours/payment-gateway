@@ -2,6 +2,7 @@ package resolvers
 
 import (
 	"context"
+	"errors"
 	"github.com/les-cours/payment-gateway/api/payment"
 	"github.com/les-cours/payment-gateway/graph/models"
 	"github.com/les-cours/payment-gateway/types"
@@ -25,9 +26,18 @@ func (r *queryResolver) GetAmount(ctx context.Context) (float64, error) {
 	return float64(res.Amount), nil
 }
 
-func (r *mutationResolver) ChargeAccount(ctx context.Context, in models.ChargeAccountRequest) (*models.OperationStatus, error) {
+func (r *mutationResolver) ChargeAccount(ctx context.Context, in models.ChargeAccountRequest) (*models.ChargeAccountResponse, error) {
 
-	res, err := r.PaymentClient.ChargeAccount(ctx, &payment.ChargeAccountRequest{
+	//user, ok := ctx.Value("user").(*types.UserToken)
+	//if !ok || *user == (types.UserToken{}) {
+	//	return nil, ErrPermissionDenied
+	//}
+	//
+	//if user.UserType != "student" {
+	//	return nil, ErrPermissionDenied
+	//}
+
+	_, err := r.PaymentClient.ChargeAccount(ctx, &payment.ChargeAccountRequest{
 		StudentID: in.StudentID,
 		Code:      in.Code,
 	})
@@ -37,8 +47,23 @@ func (r *mutationResolver) ChargeAccount(ctx context.Context, in models.ChargeAc
 		return nil, ErrApi(err)
 	}
 
-	log.Println("res : ", res.GetMessage())
-	return &models.OperationStatus{
-		Succeeded: true,
+	res, err := r.PaymentClient.GetAmount(ctx, &payment.GetAmountRequest{
+		StudentID: in.StudentID,
+	})
+	if err != nil {
+		log.Println("err: ", err.Error())
+		return nil, errors.New(err.Error())
+	}
+	res2, err := r.PaymentClient.GetAmountByCode(ctx, &payment.GetAmountRequest{
+		StudentID: in.Code,
+	})
+	if err != nil {
+		log.Println("err2: ", err.Error())
+		return nil, errors.New(err.Error())
+	}
+
+	return &models.ChargeAccountResponse{
+		Amount:    float64(res2.Amount),
+		NewAmount: float64(res.Amount),
 	}, nil
 }

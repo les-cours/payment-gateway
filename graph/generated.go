@@ -47,6 +47,11 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	ChargeAccountResponse struct {
+		Amount    func(childComplexity int) int
+		NewAmount func(childComplexity int) int
+	}
+
 	Mutation struct {
 		ChargeAccount       func(childComplexity int, in models.ChargeAccountRequest) int
 		GeneratePaymentCode func(childComplexity int, amount float64) int
@@ -63,7 +68,7 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	ChargeAccount(ctx context.Context, in models.ChargeAccountRequest) (*models.OperationStatus, error)
+	ChargeAccount(ctx context.Context, in models.ChargeAccountRequest) (*models.ChargeAccountResponse, error)
 	GeneratePaymentCode(ctx context.Context, amount float64) (*string, error)
 	PayClassRoom(ctx context.Context, in models.PayClassRoomRequest) (*string, error)
 }
@@ -89,6 +94,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "ChargeAccountResponse.amount":
+		if e.complexity.ChargeAccountResponse.Amount == nil {
+			break
+		}
+
+		return e.complexity.ChargeAccountResponse.Amount(childComplexity), true
+
+	case "ChargeAccountResponse.newAmount":
+		if e.complexity.ChargeAccountResponse.NewAmount == nil {
+			break
+		}
+
+		return e.complexity.ChargeAccountResponse.NewAmount(childComplexity), true
 
 	case "Mutation.chargeAccount":
 		if e.complexity.Mutation.ChargeAccount == nil {
@@ -364,6 +383,94 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
+func (ec *executionContext) _ChargeAccountResponse_amount(ctx context.Context, field graphql.CollectedField, obj *models.ChargeAccountResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ChargeAccountResponse_amount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Amount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ChargeAccountResponse_amount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ChargeAccountResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ChargeAccountResponse_newAmount(ctx context.Context, field graphql.CollectedField, obj *models.ChargeAccountResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ChargeAccountResponse_newAmount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NewAmount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ChargeAccountResponse_newAmount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ChargeAccountResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_chargeAccount(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_chargeAccount(ctx, field)
 	if err != nil {
@@ -390,9 +497,9 @@ func (ec *executionContext) _Mutation_chargeAccount(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*models.OperationStatus)
+	res := resTmp.(*models.ChargeAccountResponse)
 	fc.Result = res
-	return ec.marshalNOperationStatus2ᚖgithubᚗcomᚋlesᚑcoursᚋpaymentᚑgatewayᚋgraphᚋmodelsᚐOperationStatus(ctx, field.Selections, res)
+	return ec.marshalNChargeAccountResponse2ᚖgithubᚗcomᚋlesᚑcoursᚋpaymentᚑgatewayᚋgraphᚋmodelsᚐChargeAccountResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_chargeAccount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -403,10 +510,12 @@ func (ec *executionContext) fieldContext_Mutation_chargeAccount(ctx context.Cont
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "succeeded":
-				return ec.fieldContext_OperationStatus_succeeded(ctx, field)
+			case "amount":
+				return ec.fieldContext_ChargeAccountResponse_amount(ctx, field)
+			case "newAmount":
+				return ec.fieldContext_ChargeAccountResponse_newAmount(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type OperationStatus", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type ChargeAccountResponse", field.Name)
 		},
 	}
 	defer func() {
@@ -2593,6 +2702,50 @@ func (ec *executionContext) unmarshalInputPayClassRoomRequest(ctx context.Contex
 
 // region    **************************** object.gotpl ****************************
 
+var chargeAccountResponseImplementors = []string{"ChargeAccountResponse"}
+
+func (ec *executionContext) _ChargeAccountResponse(ctx context.Context, sel ast.SelectionSet, obj *models.ChargeAccountResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, chargeAccountResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ChargeAccountResponse")
+		case "amount":
+			out.Values[i] = ec._ChargeAccountResponse_amount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "newAmount":
+			out.Values[i] = ec._ChargeAccountResponse_newAmount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -3107,6 +3260,20 @@ func (ec *executionContext) unmarshalNChargeAccountRequest2githubᚗcomᚋlesᚑ
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalNChargeAccountResponse2githubᚗcomᚋlesᚑcoursᚋpaymentᚑgatewayᚋgraphᚋmodelsᚐChargeAccountResponse(ctx context.Context, sel ast.SelectionSet, v models.ChargeAccountResponse) graphql.Marshaler {
+	return ec._ChargeAccountResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNChargeAccountResponse2ᚖgithubᚗcomᚋlesᚑcoursᚋpaymentᚑgatewayᚋgraphᚋmodelsᚐChargeAccountResponse(ctx context.Context, sel ast.SelectionSet, v *models.ChargeAccountResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ChargeAccountResponse(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
 	res, err := graphql.UnmarshalFloatContext(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -3135,20 +3302,6 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) marshalNOperationStatus2githubᚗcomᚋlesᚑcoursᚋpaymentᚑgatewayᚋgraphᚋmodelsᚐOperationStatus(ctx context.Context, sel ast.SelectionSet, v models.OperationStatus) graphql.Marshaler {
-	return ec._OperationStatus(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNOperationStatus2ᚖgithubᚗcomᚋlesᚑcoursᚋpaymentᚑgatewayᚋgraphᚋmodelsᚐOperationStatus(ctx context.Context, sel ast.SelectionSet, v *models.OperationStatus) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._OperationStatus(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNPayClassRoomRequest2githubᚗcomᚋlesᚑcoursᚋpaymentᚑgatewayᚋgraphᚋmodelsᚐPayClassRoomRequest(ctx context.Context, v interface{}) (models.PayClassRoomRequest, error) {

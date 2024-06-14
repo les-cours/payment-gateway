@@ -7,6 +7,11 @@ type ChargeAccountRequest struct {
 	Code      string `json:"code"`
 }
 
+type ChargeAccountResponse struct {
+	Amount    float64 `json:"amount"`
+	NewAmount float64 `json:"newAmount"`
+}
+
 type Mutation struct {
 }
 

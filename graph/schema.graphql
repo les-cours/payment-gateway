@@ -6,7 +6,7 @@ schema {
 type Mutation {
 
 
-    chargeAccount(in: ChargeAccountRequest!): OperationStatus!
+    chargeAccount(in: ChargeAccountRequest!): ChargeAccountResponse!
     generatePaymentCode(amount: Float!): String
     payClassRoom(in: PayClassRoomRequest!): String
 
@@ -31,3 +31,7 @@ type OperationStatus {
     succeeded: Boolean!
 }
 
+type ChargeAccountResponse {
+    amount: Float!
+    newAmount: Float!
+}
